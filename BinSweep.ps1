@@ -1,8 +1,9 @@
 # Configuration
-# $logPath = Join-Path -Path $env:USERPROFILE -ChildPath "RecycleBinCleanup_Logs"
-$logPath = "C:\RecycleBinCleanup_Logs"
-$logFile = Join-Path -Path $logPath -ChildPath "RecycleBinCleanup_$(Get-Date -Format 'yyyy-MM-dd').log"
+# $logPath = Join-Path -Path $env:USERPROFILE -ChildPath "BinSweepLogs"
+$logPath = "C:\BinSweepLogs" # Set log path
+$cutoffDate = (Get-Date).AddMonths(-1) # Set cutoff date (1 month ago)
 $maxLogFilesToKeep = 7  # Keep only 1 week of logs
+$logFile = Join-Path -Path $logPath -ChildPath "BinSweepCleanup_$(Get-Date -Format 'yyyy-MM-dd').log"
 $tempFolder = Join-Path $env:TEMP "TempRecycleBin"
 
 # Create log directory if needed
@@ -11,7 +12,7 @@ if (-not (Test-Path -Path $logPath)) {
 }
 
 # Clean up old log files
-Get-ChildItem -Path $logPath -Filter "RecycleBinCleanup_*.log" | 
+Get-ChildItem -Path $logPath -Filter "BinSweepCleanup_*.log" |
     Sort-Object LastWriteTime -Descending | 
     Select-Object -Skip $maxLogFilesToKeep | 
     Remove-Item -Force | Out-Null
@@ -48,9 +49,7 @@ try {
     $items = @($recycleBin.Items())
     $totalItems = $items.Count
     Write-Log "Found $totalItems items in Recycle Bin"
-    
-    # Set cutoff date (1 month ago)
-    $cutoffDate = (Get-Date).AddMonths(-1)
+
     Write-Log "Cutoff date: $cutoffDate"
     
     # Prep for silent operation
